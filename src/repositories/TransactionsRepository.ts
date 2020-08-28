@@ -28,21 +28,28 @@ class TransactionsRepository {
       return { income: 0, outcome: 0, total: 0 };
     }
 
-    const income = this.transactions
-      .map(transaction =>
-        transaction.type === 'income' ? transaction.value : 0,
-      )
-      .reduce((accumulator, currentValue) => {
-        return accumulator + currentValue;
-      });
+    const { income, outcome } = this.transactions.reduce(
+      (accumulator, currentValue: Transaction) => {
+        switch (currentValue.type) {
+          case 'income':
+            accumulator.income += currentValue.value;
+            break;
 
-    const outcome = this.transactions
-      .map(transaction =>
-        transaction.type === 'outcome' ? transaction.value : 0,
-      )
-      .reduce((accumulator, currentValue) => {
-        return accumulator + currentValue;
-      });
+          case 'outcome':
+            accumulator.outcome += currentValue.value;
+            break;
+
+          default:
+            break;
+        }
+
+        return accumulator;
+      },
+      {
+        income: 0,
+        outcome: 0,
+      },
+    );
 
     return { income, outcome, total: income - outcome };
   }
